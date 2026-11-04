@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: best-xi-db
+    environment:
+      POSTGRES_DB: bestxi
+      POSTGRES_USER: bestxi
+      POSTGRES_PASSWORD: bestxi
+    ports:
+      - "5432:5432"
+    volumes:
+      - best-xi-data:/var/lib/postgresql/data
+
+volumes:
+  best-xi-data:
