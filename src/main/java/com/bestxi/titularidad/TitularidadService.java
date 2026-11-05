@@ -8,10 +8,13 @@ import com.bestxi.repository.AlineacionRepository;
 import com.bestxi.repository.IncidenciaRepository;
 import com.bestxi.repository.JugadorRepository;
 import com.bestxi.repository.PartidoRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,6 +32,10 @@ public class TitularidadService {
     private final AlineacionRepository alineacionRepository;
     private final IncidenciaRepository incidenciaRepository;
     private final PartidoRepository partidoRepository;
+
+    // Lee bestxi.fecha-simulada de application.yml. Si no existe, queda vacía.
+    @Value("${bestxi.fecha-simulada:}")
+    private String fechaSimulada;
 
     public TitularidadService(JugadorRepository jugadorRepository,
                               AlineacionRepository alineacionRepository,
@@ -59,6 +66,35 @@ public class TitularidadService {
 
         return calcularTitularidad(jugadorId, ultimosNPartidos, partidos.get(0).getId());
         }
+
+    public TitularidadResponse calcularTitularidadProximoPartido(Long jugadorId,
+        int ultimosNPartidos){
+
+        Jugador jugador = jugadorRepository.findById(jugadorId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el jugador " + jugadorId));
+
+        Long equipoId = jugador.getEquipo().getId();
+
+        LocalDateTime ahora = obtenerAhora();
+
+        Partido proximoPartido = partidoRepository
+                .findFirstByEquipoLocal_IdAndFechaAfterOrEquipoVisitante_IdAndFechaAfterOrderByFechaAsc(
+                        equipoId, ahora, equipoId, ahora)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No hay próximos partidos para este equipo"));
+
+        return calcularTitularidad(jugadorId, ultimosNPartidos, proximoPartido.getId());
+        }
+
+    // Devuelve la fecha simulada si está configurada y, si no, la fecha real.
+    private LocalDateTime obtenerAhora() {
+        if (fechaSimulada.isBlank()) {
+            return LocalDateTime.now();
+        }
+
+        return LocalDate.parse(fechaSimulada).atStartOfDay();
+    }
 
     public TitularidadResponse calcularTitularidad(Long jugadorId,
                                                    int ultimosNPartidos,

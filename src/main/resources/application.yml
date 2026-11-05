@@ -25,3 +25,8 @@ apifootball:
 
 telegram:
   token: ${TELEGRAM_BOT_TOKEN}
+
+bestxi:
+  # Fecha que usamos como "hoy" mientras solo haya datos de 2023/24.
+  # Con datos reales, se quita esta línea.
+  fecha-simulada: 2024-03-01

@@ -31,4 +31,13 @@ public class TitularidadController {
 
     return titularidadService.calcularTitularidad(jugadorId, ultimosPartidos, excluirPartidoId);
 }
+
+    // GET /jugadores/668/titularidad/proximo-partido?ultimosPartidos=5
+    @GetMapping("/jugadores/{id}/titularidad/proximo-partido")
+    public TitularidadResponse obtenerTitularidadProximoPartido(
+        @PathVariable("id") Long jugadorId,
+        @RequestParam(defaultValue = "5") int ultimosPartidos
+    ) {
+        return titularidadService.calcularTitularidadProximoPartido(jugadorId, ultimosPartidos);
+    }
 }
