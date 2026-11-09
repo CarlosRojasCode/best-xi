@@ -60,19 +60,18 @@ function App() {
   const analizarJugador = async (id) => {
   setPrediccion(null)
 
-  if (!jornada) {
-    setMensajeBusqueda('Indica la jornada que quieres analizar.')
-    setEsErrorBusqueda(true)
-    return
-  }
-
   setMensajeBusqueda('')
   setEsErrorBusqueda(false)
 
   try {
-    const respuesta = await fetch(
-      `http://localhost:8080/jugadores/${id}/titularidad?ultimosPartidos=5&jornada=${jornada}`
-    )
+    const urlBase = `http://localhost:8080/jugadores/${id}/titularidad`
+
+    const url = jornada
+      ? `${urlBase}?ultimosPartidos=5&jornada=${jornada}`
+      : `${urlBase}/proximo-partido?ultimosPartidos=5`
+
+    const respuesta = await fetch(url)
+
 
     if (!respuesta.ok) {
       throw new Error('Error al consultar la predicción')
@@ -89,7 +88,7 @@ function App() {
     setPrediccion({ ...datos, jornada })
   } catch (error) {
     console.error('Error al analizar jugador:', error)
-    setMensajeBusqueda('No se ha podido obtener la predicción para esa jornada.')
+    setMensajeBusqueda('No se ha podido obtener la predicción. Comprueba que Spring Boot esté iniciado y que la jornada exista.')
     setEsErrorBusqueda(true)
   }
 }
@@ -287,7 +286,7 @@ function App() {
                 </button>
               </div>
                             <div className="jornada-field">
-                <label htmlFor="jornada">Jornada</label>
+                <label htmlFor="jornada">Jornada (opcional)</label>
 
                 <input
                   id="jornada"
@@ -296,7 +295,7 @@ function App() {
                   max="38"
                   value={jornada}
                   onChange={(evento) => setJornada(evento.target.value)}
-                  placeholder="Ej. 10"
+                  placeholder="Próximo partido"
                 />
               </div>
 
@@ -347,10 +346,22 @@ function App() {
               <article className="prediction-card">
                 <div className="probability-heading">
                   <span>PROBABILIDAD DE TITULAR</span>
-                  <span className="example-tag">JORNADA {prediccion.jornada}</span>
+                  <span className="example-tag">
+                    {prediccion.jornada ? `JORNADA ${prediccion.jornada}` : 'PRÓXIMO PARTIDO'}
+                  </span>
+
                 </div>
 
                 <h3 className="prediction-player">{prediccion.nombreJugador}</h3>
+                <p className="prediction-explanation">
+                  J{prediccion.partido.jornada} · {prediccion.partido.equipoLocal} - {prediccion.partido.equipoVisitante} ·{' '}
+                  {new Date(prediccion.partido.fecha).toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+
 
                 <div className="probability-value">
                   <strong>{prediccion.porcentajeFinal}<span>%</span></strong>

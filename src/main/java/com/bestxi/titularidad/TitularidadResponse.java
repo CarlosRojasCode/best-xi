@@ -27,6 +27,9 @@ public record TitularidadResponse(
         int porcentajeFinal,
 
         // El "por qué" en texto, para humanos
-        String explicacion
+        String explicacion,
+
+        // El partido que se está prediciendo (null si no se predice ninguno concreto)
+        PartidoInfo partido
 ) {
 }

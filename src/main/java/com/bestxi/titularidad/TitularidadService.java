@@ -175,7 +175,8 @@ public class TitularidadService {
                     null, null, null, null,
                     null,
                     0,
-                    "No hay historial de partidos disponible para este jugador todavía."
+                    "No hay historial de partidos disponible para este jugador todavía.",
+                    crearPartidoInfo(partidoObjetivoFinal)
             );
         }
 
@@ -360,8 +361,17 @@ public class TitularidadService {
 
                 frecuenciaUltimosTres,
                 porcentajeFinal,
-                explicacion
+                explicacion,
+                crearPartidoInfo(partidoObjetivoFinal)
         );
+    }
+
+    private PartidoInfo crearPartidoInfo(Partido partido) {
+        if(partido == null){
+                return null;
+        }else{
+               return new PartidoInfo(partido.getJornada(), partido.getEquipoLocal().getNombre(), partido.getEquipoVisitante().getNombre(), partido.getFecha());
+        }
     }
 
     private String construirExplicacion(
