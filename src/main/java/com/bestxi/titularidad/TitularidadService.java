@@ -317,29 +317,13 @@ public class TitularidadService {
                 construirDetalleAusencias(incidenciasForzosas);
 
         String explicacion = construirExplicacion(
-                ultimos.get(0),
+                partidoObjetivoFinal,
+                porcentajeFinal,
                 frecuenciaReciente,
                 ultimos.size(),
                 (int) titularesRecientes,
-
-                frecuenciaTemporada,
-                historialCompleto.size(),
-                (int) titularesTemporada,
-
-                frecuenciaConEntrenador,
                 conEntrenadorActual.size(),
-
-                porcentaje(titularesCasa, partidosCasa.size()),
-                partidosCasa.size(),
-                (int) titularesCasa,
-
-                porcentaje(titularesFuera, partidosFuera.size()),
-                partidosFuera.size(),
-                (int) titularesFuera,
-
-                frecuenciaUltimosTres,
-                ultimosTres,
-
+                (int) titularesConEntrenador,
                 detalleAusencias
         );
 
@@ -394,117 +378,47 @@ public class TitularidadService {
     }
 
     private String construirExplicacion(
-        Alineacion ultimaAlineacion,
+        Partido partido,
+        int porcentajeFinal,
         int frecuenciaReciente,
         int totalRecientes,
         int titularesRecientes,
-        int frecuenciaTemporada,
-        int totalTemporada,
-        int titularesTemporada,
-        Integer frecuenciaEntrenador,
         int partidosEntrenador,
-        int frecuenciaCasa,
-        int partidosCasa,
-        int titularesCasa,
-        int frecuenciaFuera,
-        int partidosFuera,
-        int titularesFuera,
-        int frecuenciaUltimosTres,
-        List<Alineacion> ultimosTres,
+        int titularesEntrenador,
         String detalleAusencias) {
 
     StringBuilder texto = new StringBuilder();
 
-    // Resumen reciente
-    texto.append("En sus últimos ")
-            .append(totalRecientes)
-            .append(" partidos registrados, fue titular en ")
-            .append(titularesRecientes)
-            .append(". ");
-
-    // Historial general
-    texto.append("En su historial disponible, fue titular en ")
-            .append(titularesTemporada)
-            .append(" de ")
-            .append(totalTemporada)
-            .append(" partidos. ");
-
-    // Últimos tres partidos
-    if (!ultimosTres.isEmpty()) {
-
-        String ultimosPartidos = ultimosTres.stream()
-                .map(a -> "J" + a.getPartido().getJornada()
-                        + (Boolean.TRUE.equals(a.getTitular())
-                        ? " titular"
-                        : " suplente"))
-                .collect(Collectors.joining(", "));
-
-        texto.append("Sus últimas ")
-                .append(ultimosTres.size())
-                .append(" jornadas con alineación registrada: ")
-                .append(ultimosPartidos)
-                .append(". ");
+    // Qué partido se predice
+    if (partido != null) {
+        texto.append("Para el ")
+                .append(partido.getEquipoLocal().getNombre())
+                .append(" - ")
+                .append(partido.getEquipoVisitante().getNombre())
+                .append(" (J")
+                .append(partido.getJornada())
+                .append(") tiene un ");
+    } else {
+        texto.append("Tiene un ");
     }
+
+    // Motivo principal del porcentaje
+    texto.append(porcentajeFinal)
+            .append(" % ")
+            .append(describirMotivoPrincipal(frecuenciaReciente))
+            .append(": titular en ")
+            .append(titularesRecientes)
+            .append(" de ")
+            .append(totalRecientes)
+            .append(" partidos recientes. ");
 
     // Confianza con el entrenador actual
     if (partidosEntrenador >= 3) {
-
-        texto.append("Con el entrenador actual, ");
-
-        if (frecuenciaEntrenador >= 75) {
-                texto.append("suele ser titular.");
-        } else if (frecuenciaEntrenador >= 50) {
-                texto.append("alterna titularidades y suplencias.");
-        } else if (frecuenciaUltimosTres >= 80 && frecuenciaEntrenador > 0) {
-        texto.append("su historial con el entrenador es irregular, "
-            + "pero su tendencia reciente es positiva.");
-        } else if (frecuenciaEntrenador > 0) {
-        texto.append("ha sido titular en pocas ocasiones.");
-        } else {
-                texto.append("todavía no ha sido titular en los partidos registrados.");
-        }
-        texto.append(" ");
-    }
-
-    // Comparación entre casa y fuera
-    if (partidosCasa >= 4 && partidosFuera >= 4) {
-
-        int diferencia = Math.abs(frecuenciaCasa - frecuenciaFuera);
-
-        if (diferencia >= 20) {
-
-            boolean masFuera = frecuenciaFuera > frecuenciaCasa;
-
-            texto.append("Parece contar más con él ")
-                    .append(masFuera ? "fuera de casa" : "en casa")
-                    .append(" (titular en ")
-                    .append(masFuera ? titularesFuera : titularesCasa)
-                    .append(" de ")
-                    .append(masFuera ? partidosFuera : partidosCasa)
-                    .append(" partidos, frente a ")
-                    .append(masFuera ? titularesCasa : titularesFuera)
-                    .append(" de ")
-                    .append(masFuera ? partidosCasa : partidosFuera)
-                    .append(" ")
-                    .append(masFuera ? "en casa" : "fuera de casa")
-                    .append("). ");
-
-        } else {
-        texto.append("Su presencia en el once es parecida en casa y fuera ")
-            .append("(titular en ")
-            .append(titularesCasa)
-            .append(" de ")
-            .append(partidosCasa)
-            .append(" partidos en casa y ")
-            .append(titularesFuera)
-            .append(" de ")
-            .append(partidosFuera)
-            .append(" fuera). ");
-}
-
-    } else {
-        texto.append("Todavía no hay suficientes partidos en casa y fuera ")
-                .append("para comparar ambas situaciones. ");
+        texto.append("Con el entrenador actual ha sido titular en ")
+                .append(titularesEntrenador)
+                .append(" de ")
+                .append(partidosEntrenador)
+                .append(" partidos. ");
     }
 
     // Ausencias justificadas
@@ -514,6 +428,17 @@ public class TitularidadService {
 
     return texto.toString().trim();
 }
+
+    // Devuelve el trozo de frase que explica el porcentaje.
+    private String describirMotivoPrincipal(int frecuenciaReciente) {
+        if(frecuenciaReciente >= 80){
+                return "gracias a su buena racha";
+        }else if(frecuenciaReciente >= 40){
+                return "porque últimamente alterna titularidades y suplencias";
+        }else{
+                return "porque últimamente no suele ser titular";
+        }
+    }
 
 
     private String construirDetalleAusencias(List<Incidencia> incidencias) {
@@ -532,10 +457,11 @@ public class TitularidadService {
             .map(e -> e.getValue() + " por " + e.getKey())
             .collect(Collectors.joining(", "));
 
-    return "Se excluyen del cálculo "
+    return "No cuentan en su contra "
             + totalPartidos
-            + " partidos: "
-            + resumen;
+            + (totalPartidos == 1 ? " partido que se perdió: " : " partidos que se perdió: ")
+            + resumen
+            + ".";
 }
 
     // Agrupa las ausencias por motivo: motivo -> número de partidos.
