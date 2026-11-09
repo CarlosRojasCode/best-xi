@@ -30,6 +30,12 @@ public record TitularidadResponse(
         String explicacion,
 
         // El partido que se está prediciendo (null si no se predice ninguno concreto)
-        PartidoInfo partido
+        PartidoInfo partido,
+
+        // Sus últimos partidos, del más reciente al más antiguo
+        java.util.List<UltimoPartidoInfo> ultimosPartidos,
+
+        // Ausencias justificadas agrupadas por motivo
+        java.util.List<AusenciaInfo> ausencias
 ) {
 }

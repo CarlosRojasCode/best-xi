@@ -176,7 +176,9 @@ public class TitularidadService {
                     null,
                     0,
                     "No hay historial de partidos disponible para este jugador todavía.",
-                    crearPartidoInfo(partidoObjetivoFinal)
+                    crearPartidoInfo(partidoObjetivoFinal),
+                    List.of(),
+                    List.of()
             );
         }
 
@@ -362,8 +364,25 @@ public class TitularidadService {
                 frecuenciaUltimosTres,
                 porcentajeFinal,
                 explicacion,
-                crearPartidoInfo(partidoObjetivoFinal)
+                crearPartidoInfo(partidoObjetivoFinal),
+                crearUltimosPartidos(ultimos),
+                crearAusencias(incidenciasForzosas)
         );
+    }
+
+    private List<AusenciaInfo> crearAusencias(List<Incidencia> incidencias) {
+        Map<String, Integer> cantidadPorMotivo = contarAusenciasPorMotivo(incidencias);
+        return cantidadPorMotivo.entrySet().stream()
+                .map(e -> new AusenciaInfo(e.getKey(), e.getValue()))
+                .toList();
+
+    }
+
+    private List<UltimoPartidoInfo> crearUltimosPartidos(List<Alineacion> alineaciones) {
+        return alineaciones.stream()
+        .map(a -> new UltimoPartidoInfo(a.getPartido().getJornada(), a.getTitular()))
+        .toList();
+
     }
 
     private PartidoInfo crearPartidoInfo(Partido partido) {
@@ -471,8 +490,7 @@ public class TitularidadService {
                     .append("). ");
 
         } else {
-    texto.append("Todavía hay pocos datos para comparar ")
-            .append("su presencia en el once en casa y fuera ")
+        texto.append("Su presencia en el once es parecida en casa y fuera ")
             .append("(titular en ")
             .append(titularesCasa)
             .append(" de ")
@@ -504,6 +522,25 @@ public class TitularidadService {
         return "";
     }
 
+    Map<String, Integer> cantidadPorMotivo = contarAusenciasPorMotivo(incidencias);
+
+    int totalPartidos = cantidadPorMotivo.values().stream()
+            .mapToInt(Integer::intValue)
+            .sum();
+
+    String resumen = cantidadPorMotivo.entrySet().stream()
+            .map(e -> e.getValue() + " por " + e.getKey())
+            .collect(Collectors.joining(", "));
+
+    return "Se excluyen del cálculo "
+            + totalPartidos
+            + " partidos: "
+            + resumen;
+}
+
+    // Agrupa las ausencias por motivo: motivo -> número de partidos.
+    private Map<String, Integer> contarAusenciasPorMotivo(List<Incidencia> incidencias) {
+
     // Evitamos contar dos veces el mismo partido
     Map<Long, String> motivoPorPartido = new LinkedHashMap<>();
 
@@ -521,14 +558,7 @@ public class TitularidadService {
         cantidadPorMotivo.merge(motivo, 1, Integer::sum);
     }
 
-    String resumen = cantidadPorMotivo.entrySet().stream()
-            .map(e -> e.getValue() + " por " + e.getKey())
-            .collect(Collectors.joining(", "));
-
-    return "Se excluyen del cálculo "
-            + motivoPorPartido.size()
-            + " partidos: "
-            + resumen;
+    return cantidadPorMotivo;
 }
 
     /**

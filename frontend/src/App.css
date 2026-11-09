@@ -864,3 +864,18 @@
     align-items: flex-start;
   }
 }
+
+/* Tarjeta de predicción: últimos partidos del jugador */
+.prediction-recent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.prediction-recent .suplente {
+  color: #a5a5a5;
+  background: #303030;
+}

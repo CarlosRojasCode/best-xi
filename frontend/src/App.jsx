@@ -387,8 +387,40 @@ function App() {
                     <dt>Frecuencia últimos 3</dt>
                     <dd>{prediccion.frecuenciaUltimos3}%</dd>
                   </div>
-                </dl>
+                  <div>
+                    <dt>Con el entrenador (partidos: {prediccion.partidosConEntrenadorActual})</dt>
+                    <dd>{prediccion.frecuenciaConEntrenadorActual}%</dd>
+                  </div>
+                  <div>
+                    <dt>En casa (partidos: {prediccion.partidosCasa})</dt>
+                    <dd>{prediccion.partidosCasa > 0 ? `${prediccion.frecuenciaCasa}%` : 'Sin datos'}</dd>
+                  </div>
+                  <div>
+                    <dt>Fuera (partidos: {prediccion.partidosFuera})</dt>
+                    <dd>{prediccion.partidosFuera > 0 ? `${prediccion.frecuenciaFuera}%` : 'Sin datos'}</dd>
+                  </div>
 
+                </dl>
+                <div className="prediction-recent">
+                  {prediccion.ultimosPartidos.map((ultimo) => (
+                    <span
+                      className={`example-tag ${ultimo.titular ? '' : 'suplente'}`}
+                      key={ultimo.jornada}
+                    >
+                      J{ultimo.jornada} · {ultimo.titular ? 'Titular' : 'Suplente'}
+                    </span>
+                  ))}
+                </div>
+                 {prediccion.ausencias.length > 0 && (
+                <div className="prediction-recent">
+                  {prediccion.ausencias.map((ausencia) => (
+                    <span className="example-tag suplente" key={ausencia.motivo}>
+                      {ausencia.partidos} {ausencia.partidos === 1 ? 'partido' : 'partidos'} · {ausencia.motivo}
+                    </span>
+                  ))}
+                </div>
+              )}
+ 
                 <p className="prediction-explanation">{prediccion.explicacion}</p>
               </article>
             )}
