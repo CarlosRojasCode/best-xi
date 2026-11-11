@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import './App.css'
 
+// Dirección del backend. En el servidor se indica con la variable VITE_API_URL;
+// si no existe (en tu ordenador), se usa la de siempre.
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 // Traduce la letra de la posición que guarda el backend a texto en español
 const POSICIONES = {
   G: 'Portero',
@@ -62,7 +66,7 @@ function App() {
 
     try {
       const respuesta = await fetch(
-        `http://localhost:8080/api/jugadores?nombre=${encodeURIComponent(nombre)}`
+        `${API_URL}/api/jugadores?nombre=${encodeURIComponent(nombre)}`
       )
 
       if (!respuesta.ok) {
@@ -94,7 +98,7 @@ function App() {
   setEsErrorBusqueda(false)
 
   try {
-    const urlBase = `http://localhost:8080/jugadores/${id}/titularidad`
+    const urlBase = `${API_URL}/jugadores/${id}/titularidad`
 
     const url = jornada
       ? `${urlBase}?ultimosPartidos=5&jornada=${jornada}`

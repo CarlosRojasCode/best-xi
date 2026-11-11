@@ -3,9 +3,9 @@ spring:
     name: best-xi
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/bestxi
-    username: bestxi
-    password: bestxi
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bestxi}
+    username: ${DB_USUARIO:bestxi}
+    password: ${DB_PASSWORD:bestxi}
 
   jpa:
     hibernate:
@@ -30,3 +30,6 @@ bestxi:
   # Fecha que usamos como "hoy" mientras solo haya datos de 2023/24.
   # Con datos reales, se quita esta línea.
   fecha-simulada: 2024-03-01
+
+  # Webs que pueden llamar al backend (CORS), separadas por comas.
+  cors-origenes: ${CORS_ORIGENES:http://localhost:5173,http://localhost:5174}
