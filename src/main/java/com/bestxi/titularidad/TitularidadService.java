@@ -5,6 +5,7 @@ import com.bestxi.model.Incidencia;
 import com.bestxi.model.Jugador;
 import com.bestxi.model.Partido;
 import com.bestxi.repository.AlineacionRepository;
+import com.bestxi.repository.EquipoRepository;
 import com.bestxi.repository.IncidenciaRepository;
 import com.bestxi.repository.JugadorRepository;
 import com.bestxi.repository.PartidoRepository;
@@ -28,6 +29,7 @@ import java.util.LinkedHashMap;
 @Service
 public class TitularidadService {
 
+    private final EquipoRepository equipoRepository;
     private final JugadorRepository jugadorRepository;
     private final AlineacionRepository alineacionRepository;
     private final IncidenciaRepository incidenciaRepository;
@@ -40,11 +42,12 @@ public class TitularidadService {
     public TitularidadService(JugadorRepository jugadorRepository,
                               AlineacionRepository alineacionRepository,
                               IncidenciaRepository incidenciaRepository,
-                              PartidoRepository partidoRepository) {
+                              PartidoRepository partidoRepository, EquipoRepository equipoRepository) {
         this.jugadorRepository = jugadorRepository;
         this.alineacionRepository = alineacionRepository;
         this.incidenciaRepository = incidenciaRepository;
         this.partidoRepository = partidoRepository;
+        this.equipoRepository = equipoRepository;
     }
 
     public TitularidadResponse calcularTitularidadParaJornada(Long jugadorId,
@@ -170,6 +173,9 @@ public class TitularidadService {
                     jugador.getId(),
                     jugador.getNombre(),
                     jugador.getPosicion(),
+                    jugador.getDorsal(),
+                    jugador.getEquipo().getNombre(),
+                    jugador.getEquipo().getEscudoUrl(),
                     0, 0, 0,
                     null, null,
                     null, null, null, null,
@@ -332,6 +338,10 @@ public class TitularidadService {
                 jugador.getNombre(),
                 jugador.getPosicion(),
 
+                jugador.getDorsal(),
+                jugador.getEquipo().getNombre(),
+                jugador.getEquipo().getEscudoUrl(),
+                
                 ultimos.size(),
                 (int) titularesRecientes,
                 frecuenciaReciente,

@@ -1,6 +1,36 @@
 import { useState } from 'react'
 import './App.css'
 
+// Traduce la letra de la posición que guarda el backend a texto en español
+const POSICIONES = {
+  G: 'Portero',
+  D: 'Defensa',
+  M: 'Centrocampista',
+  F: 'Delantero',
+}
+
+// Texto que acompaña a cada nivel de probabilidad en la tarjeta
+const TEXTO_NIVEL = {
+  alta: 'Probable titular',
+  media: 'En duda',
+  baja: 'Probable suplente',
+  cero: 'Suplente seguro salvo sorpresa'
+}
+
+// Decide si una probabilidad (0-100) es 'alta', 'media', 'baja' o 'cero'.
+// Solo sirve para el color y el texto de la tarjeta, no cambia la predicción.
+function nivelProbabilidad(porcentaje) {
+  if(porcentaje >= 70){
+    return 'alta'
+  }else if(porcentaje >=50){
+    return 'media'
+  }else if(porcentaje >=1){
+    return 'baja'
+  }else{
+    return 'cero'
+  }
+}
+
 function App() {
   const [nombreJugador, setNombreJugador] = useState('')
   const [jugadores, setJugadores] = useState([])
@@ -334,12 +364,7 @@ function App() {
 
                       <div className="search-result-actions">
                         <span className="search-result-position">
-                          {{
-                            G: 'Portero',
-                            D: 'Defensa',
-                            M: 'Centrocampista',
-                            F: 'Delantero',
-                          }[jugador.posicion] || 'Posición no disponible'}
+                          {POSICIONES[jugador.posicion] || 'Posición no disponible'}
                         </span>
 
                         <button
@@ -356,7 +381,9 @@ function App() {
               </div>
             )}
                         {prediccion && (
-              <article className="prediction-card">
+              <article
+                className={`prediction-card nivel-${nivelProbabilidad(prediccion.porcentajeFinal)}`}
+              >
                 <div className="probability-heading">
                   <span>PROBABILIDAD DE TITULAR</span>
                   <span className="example-tag">
@@ -365,7 +392,26 @@ function App() {
 
                 </div>
 
-                <h3 className="prediction-player">{prediccion.nombreJugador}</h3>
+                {/* Ficha del jugador: escudo, nombre, posición y dorsal */}
+                <div className="prediction-header">
+                  {prediccion.escudoUrl && (
+                    <img
+                      className="prediction-crest"
+                      src={prediccion.escudoUrl}
+                      alt={`Escudo de ${prediccion.equipoNombre}`}
+                    />
+                  )}
+
+                  <div className="prediction-identity">
+                    <span className="player-team">{prediccion.equipoNombre}</span>
+                    <h3 className="prediction-player">{prediccion.nombreJugador}</h3>
+                    <p className="prediction-position">
+                      {POSICIONES[prediccion.posicion] || 'Posición no disponible'}
+                    </p>
+                  </div>
+
+                  <span className="prediction-dorsal">{prediccion.dorsal ?? '–'}</span>
+                </div>
                 <p className="prediction-explanation">
                   J{prediccion.partido.jornada} · {prediccion.partido.equipoLocal} - {prediccion.partido.equipoVisitante} ·{' '}
                   {new Date(prediccion.partido.fecha).toLocaleDateString('es-ES', {
@@ -378,6 +424,9 @@ function App() {
 
                 <div className="probability-value">
                   <strong>{prediccion.porcentajeFinal}<span>%</span></strong>
+                  <span className="probability-status">
+                    {TEXTO_NIVEL[nivelProbabilidad(prediccion.porcentajeFinal)]}
+                  </span>
                 </div>
 
                 <div className="progress-track">

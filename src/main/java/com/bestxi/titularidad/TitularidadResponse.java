@@ -5,6 +5,11 @@ public record TitularidadResponse(
         String nombreJugador,
         String posicion,
 
+        // Datos para la ficha visual del jugador
+        Integer dorsal,
+        String equipoNombre,
+        String escudoUrl,
+
         // Señal 1: frecuencia en los últimos N partidos
         int partidosAnalizados,
         int titularesRecientes,

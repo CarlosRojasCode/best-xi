@@ -921,3 +921,80 @@
   color: #a5a5a5;
   background: #303030;
 }
+
+/* Ficha del jugador en la tarjeta de predicción (paso 6) */
+.prediction-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.prediction-crest {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.prediction-identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.prediction-card .prediction-header .prediction-player {
+  margin: 4px 0;
+}
+
+.prediction-position {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.prediction-dorsal {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: #2c3324;
+  color: var(--accent);
+  font-weight: 900;
+  font-size: 22px;
+}
+
+/* Color de la predicción según su nivel: alta, media o baja (paso 6) */
+.prediction-card.nivel-alta {
+  --nivel: var(--accent);
+}
+
+.prediction-card.nivel-media {
+  --nivel: #f2b84b;
+}
+
+.prediction-card.nivel-baja {
+  --nivel: #e5735f;
+}
+
+.prediction-card.nivel-cero {
+  --nivel: #A9A9A9;
+}
+
+.prediction-card .probability-value strong span {
+  color: var(--nivel, var(--accent));
+}
+
+.prediction-card .progress-fill {
+  background: var(--nivel, var(--accent));
+}
+
+.prediction-card .probability-status {
+  color: var(--nivel, var(--muted));
+  font-size: 13px;
+  font-weight: 700;
+}
