@@ -148,6 +148,19 @@ function App() {
               </a>
             </div>
 
+            {/* Resultados del backtest (texto fijo: actualizar al añadir equipos) */}
+            <div className="hero-stats">
+              <div className="hero-stat">
+                <strong>78<span>%</span></strong>
+                <p>de acierto en 2.120 predicciones de LaLiga 2023/24</p>
+              </div>
+
+              <div className="hero-stat">
+                <strong>79<span>%</span></strong>
+                <p>fueron titulares cuando predijimos un 50 % o más</p>
+              </div>
+            </div>
+
             <div className="hero-note">
               <span className="note-line"></span>
               Datos, contexto y análisis futbolístico.

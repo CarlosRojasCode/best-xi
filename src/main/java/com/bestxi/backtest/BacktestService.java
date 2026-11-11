@@ -6,6 +6,8 @@ import com.bestxi.repository.AlineacionRepository;
 import com.bestxi.repository.IncidenciaRepository;
 import com.bestxi.titularidad.TitularidadResponse;
 import com.bestxi.titularidad.TitularidadService;
+import com.bestxi.titularidad.UltimoPartidoInfo;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,6 +42,9 @@ public class BacktestService {
             int casosEvaluados,
             int aciertos,
             int porcentajeAcierto,
+            // Regla simple para comparar: "titular si fue titular en su partido anterior"
+            int aciertosReglaSimple,
+            int porcentajeAciertoReglaSimple,
             List<Tramo> tramos) {
     }
 
@@ -58,6 +63,7 @@ public class BacktestService {
 
         int casos = 0;
         int aciertos = 0;
+        int aciertosReglaSimple = 0;
 
         for (Alineacion registro : registros) {
 
@@ -89,6 +95,10 @@ public class BacktestService {
 
             if (predijoTitular == realmenteTitular) {
                 aciertos++;
+            }
+
+            if(prediccion.ultimosPartidos().get(0).titular() == realmenteTitular){
+                aciertosReglaSimple++;
             }
 
             int tramo = tramoDe(porcentaje);
@@ -133,10 +143,18 @@ public class BacktestService {
                         : (int) Math.round(
                         aciertos * 100.0 / casos);
 
+        int porcentajeAciertoReglaSimple =
+                casos == 0
+                        ? 0
+                        : (int) Math.round(
+                        aciertosReglaSimple * 100.0 / casos);
+
         return new Resultado(
                 casos,
                 aciertos,
                 porcentajeAcierto,
+                aciertosReglaSimple,
+                porcentajeAciertoReglaSimple,
                 tramos
         );
     }

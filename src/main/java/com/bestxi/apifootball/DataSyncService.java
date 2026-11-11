@@ -150,6 +150,31 @@ public class DataSyncService {
         }
     }
 
+    // Paso 4: rellena posición y dorsal de los jugadores de un partido SIN volver a guardar la alineación
+    @Transactional
+    public void completarDatosJugadores(long partidoId) {
+        LineupResponse respuesta = client.obtenerAlineaciones(partidoId);
+
+        for (LineupResponse.LineupData datosEquipo : respuesta.response()) {
+            Equipo equipo = obtenerOCrearEquipo(datosEquipo.team());
+
+            // obtenerOCrearJugador solo rellena lo que está vacío; no guardamos filas de alineacion
+            for (LineupResponse.PlayerSlot slot : datosEquipo.startXI()) {
+                obtenerOCrearJugador(
+                        slot.player().id(), slot.player().name(), equipo,
+                        slot.player().pos(), slot.player().number()
+                );
+            }
+
+            for (LineupResponse.PlayerSlot slot : datosEquipo.substitutes()) {
+                obtenerOCrearJugador(
+                        slot.player().id(), slot.player().name(), equipo,
+                        slot.player().pos(), slot.player().number()
+                );
+            }
+        }
+    }
+
     // --- Métodos de apoyo, para no repetir código ---
 
     private Equipo obtenerOCrearEquipo(FixtureResponse.TeamRef ref) {

@@ -40,4 +40,12 @@ public class SyncController {
         dataSyncService.importarIncidencias(liga, temporada, equipoId);
         return "Incidencias importadas correctamente";
     }
+
+    // POST /admin/sync/jugadores/completar?partidoId=1038201
+    // Vuelve a pedir la alineación de un partido solo para rellenar posición y dorsal de jugadores que los tengan a null
+    @PostMapping("/admin/sync/jugadores/completar")
+    public String completarDatosJugadores(@RequestParam long partidoId) {
+        dataSyncService.completarDatosJugadores(partidoId);
+        return "Datos de jugadores completados con la alineación del partido " + partidoId;
+    }
 }
