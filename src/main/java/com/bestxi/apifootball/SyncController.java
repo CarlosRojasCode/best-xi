@@ -1,9 +1,11 @@
 package com.bestxi.apifootball;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@ConditionalOnProperty(name = "bestxi.admin-activo", havingValue = "true")
 @RestController
 public class SyncController {
 

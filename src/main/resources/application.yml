@@ -33,3 +33,6 @@ bestxi:
 
   # Webs que pueden llamar al backend (CORS), separadas por comas.
   cors-origenes: ${CORS_ORIGENES:http://localhost:5173,http://localhost:5174}
+
+  # Endpoints /admin (importar datos y backtest). En el servidor: ADMIN_ACTIVO=false
+  admin-activo: ${ADMIN_ACTIVO:true}
