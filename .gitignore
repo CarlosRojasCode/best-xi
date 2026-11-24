@@ -37,3 +37,6 @@ build/
 
 ### Registros locales ###
 error-spring.txt
+
+### Notas de trabajo (solo en local) ###
+CLAUDE.md
