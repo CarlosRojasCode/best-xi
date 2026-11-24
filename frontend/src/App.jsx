@@ -24,13 +24,13 @@ const TEXTO_NIVEL = {
 // Decide si una probabilidad (0-100) es 'alta', 'media', 'baja' o 'cero'.
 // Solo sirve para el color y el texto de la tarjeta, no cambia la predicción.
 function nivelProbabilidad(porcentaje) {
-  if(porcentaje >= 70){
+  if (porcentaje >= 70) {
     return 'alta'
-  }else if(porcentaje >=50){
+  } else if (porcentaje >= 50) {
     return 'media'
-  }else if(porcentaje >=1){
+  } else if (porcentaje >= 1) {
     return 'baja'
-  }else{
+  } else {
     return 'cero'
   }
 }
@@ -64,10 +64,19 @@ function App() {
     setMensajeBusqueda('')
     setEsErrorBusqueda(false)
 
+    // Si el servidor tarda más de 3 s, casi seguro que Render lo está despertando
+    const avisoServidorLento = setTimeout(() => {
+      setMensajeBusqueda(
+        'El servidor se está despertando. La primera búsqueda puede tardar hasta un minuto…'
+      )
+    }, 3000)
+
     try {
       const respuesta = await fetch(
         `${API_URL}/api/jugadores?nombre=${encodeURIComponent(nombre)}`
       )
+      clearTimeout(avisoServidorLento)
+      setMensajeBusqueda('')
 
       if (!respuesta.ok) {
         throw new Error('Error al consultar los jugadores')
@@ -83,49 +92,52 @@ function App() {
     } catch (error) {
       console.error('Error al buscar jugadores:', error)
       setMensajeBusqueda(
-        'No se ha podido conectar con Spring Boot. Comprueba que esté iniciado.'
+        'No se ha podido conectar con el servidor. Inténtalo de nuevo en unos segundos.'
       )
       setEsErrorBusqueda(true)
     } finally {
+      clearTimeout(avisoServidorLento)
       setBuscando(false)
     }
   }
 
   const analizarJugador = async (id) => {
-  setPrediccion(null)
+    setPrediccion(null)
 
-  setMensajeBusqueda('')
-  setEsErrorBusqueda(false)
+    setMensajeBusqueda('')
+    setEsErrorBusqueda(false)
 
-  try {
-    const urlBase = `${API_URL}/jugadores/${id}/titularidad`
+    try {
+      const urlBase = `${API_URL}/jugadores/${id}/titularidad`
 
-    const url = jornada
-      ? `${urlBase}?ultimosPartidos=5&jornada=${jornada}`
-      : `${urlBase}/proximo-partido?ultimosPartidos=5`
+      const url = jornada
+        ? `${urlBase}?ultimosPartidos=5&jornada=${jornada}`
+        : `${urlBase}/proximo-partido?ultimosPartidos=5`
 
-    const respuesta = await fetch(url)
+      const respuesta = await fetch(url)
 
 
-    if (!respuesta.ok) {
-      throw new Error('Error al consultar la predicción')
-    }
+      if (!respuesta.ok) {
+        throw new Error('Error al consultar la predicción')
+      }
 
-    const datos = await respuesta.json()
+      const datos = await respuesta.json()
 
-    if (datos.partidosAnalizados === 0) {
-      setMensajeBusqueda(datos.explicacion)
+      if (datos.partidosAnalizados === 0) {
+        setMensajeBusqueda(datos.explicacion)
+        setEsErrorBusqueda(true)
+        return
+      }
+
+      setPrediccion({ ...datos, jornada })
+    } catch (error) {
+      console.error('Error al analizar jugador:', error)
+      setMensajeBusqueda('No se ha podido obtener la predicción. Comprueba que la jornada exista e inténtalo de nuevo.')
+
+
       setEsErrorBusqueda(true)
-      return
     }
-
-    setPrediccion({ ...datos, jornada })
-  } catch (error) {
-    console.error('Error al analizar jugador:', error)
-    setMensajeBusqueda('No se ha podido obtener la predicción. Comprueba que Spring Boot esté iniciado y que la jornada exista.')
-    setEsErrorBusqueda(true)
   }
-}
 
 
   return (
@@ -332,7 +344,7 @@ function App() {
                   <span>→</span>
                 </button>
               </div>
-                            <div className="jornada-field">
+              <div className="jornada-field">
                 <label htmlFor="jornada">Jornada (opcional)</label>
 
                 <input
@@ -384,7 +396,7 @@ function App() {
                 </div>
               </div>
             )}
-                        {prediccion && (
+            {prediccion && (
               <article
                 className={`prediction-card nivel-${nivelProbabilidad(prediccion.porcentajeFinal)}`}
               >
@@ -477,16 +489,16 @@ function App() {
                     </span>
                   ))}
                 </div>
-                 {prediccion.ausencias.length > 0 && (
-                <div className="prediction-recent">
-                  {prediccion.ausencias.map((ausencia) => (
-                    <span className="example-tag suplente" key={ausencia.motivo}>
-                      {ausencia.partidos} {ausencia.partidos === 1 ? 'partido' : 'partidos'} · {ausencia.motivo}
-                    </span>
-                  ))}
-                </div>
-              )}
- 
+                {prediccion.ausencias.length > 0 && (
+                  <div className="prediction-recent">
+                    {prediccion.ausencias.map((ausencia) => (
+                      <span className="example-tag suplente" key={ausencia.motivo}>
+                        {ausencia.partidos} {ausencia.partidos === 1 ? 'partido' : 'partidos'} · {ausencia.motivo}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <p className="prediction-explanation">{prediccion.explicacion}</p>
               </article>
             )}
