@@ -25,6 +25,8 @@ apifootball:
 
 telegram:
   token: ${TELEGRAM_BOT_TOKEN}
+  # Bot de Telegram. En el servidor: TELEGRAM_ACTIVO=false (y entonces el token no hace falta)
+  activo: ${TELEGRAM_ACTIVO:true}
 
 bestxi:
   # Fecha que usamos como "hoy" mientras solo haya datos de 2023/24.

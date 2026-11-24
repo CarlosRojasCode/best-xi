@@ -7,6 +7,7 @@ import com.bestxi.repository.JugadorRepository;
 import com.bestxi.repository.PartidoRepository;
 import com.bestxi.titularidad.TitularidadResponse;
 import com.bestxi.titularidad.TitularidadService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -23,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@ConditionalOnProperty(name = "telegram.activo", havingValue = "true")
 @Component
 public class BestXiBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
 
